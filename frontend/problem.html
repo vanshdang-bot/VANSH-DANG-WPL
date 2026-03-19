@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem — CodePractice</title>
+    <meta name="description" content="Solve coding problems, get instant feedback, and learn to code.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ─── Navigation Bar ──────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-logo">⚡ CodePractice</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Problems</a>
+                <a href="submissions.html" class="nav-link">Submissions</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Main Content ────────────────────────────────────── -->
+    <main class="main-content">
+
+        <!-- Loading State -->
+        <div id="loadingState" class="brutal-card no-hover brutal-pulse" style="padding:2rem; text-align:center;">
+            <p style="font-size:1.25rem; font-weight:700;">Loading problem...</p>
+        </div>
+
+        <!-- Not Found State -->
+        <div id="notFoundState" class="hidden brutal-card no-hover" style="padding:2rem; text-align:center;">
+            <p style="font-size:1.25rem; font-weight:700;">Problem not found 😕</p>
+        </div>
+
+        <!-- Problem Layout -->
+        <div id="problemContent" class="hidden problem-layout">
+
+            <!-- ─── LEFT PANEL ──────────────────────────────────── -->
+            <div class="problem-left">
+                <div class="brutal-card no-hover problem-desc">
+                    <div class="problem-title-row">
+                        <h1 id="problemTitle"></h1>
+                        <span id="problemBadge" class="badge"></span>
+                    </div>
+
+                    <div id="problemBody" class="problem-body"></div>
+
+                    <!-- Example Test Case -->
+                    <div id="exampleTestCase" class="test-case-box">
+                        <h3>📋 Example Test Case</h3>
+                        <div id="exampleInput"></div>
+                        <div>
+                            <p class="test-case-label">Expected Output:</p>
+                            <pre id="exampleOutput" class="test-case-pre"></pre>
+                        </div>
+                    </div>
+
+                    <!-- Hidden tests indicator -->
+                    <div id="hiddenTestsInfo" class="hidden-tests"></div>
+                </div>
+
+                <!-- Past Submissions -->
+                <div id="pastSubmissionsCard" class="brutal-card no-hover past-submissions hidden">
+                    <h3>📋 Your Submissions</h3>
+                    <div id="pastSubmissionsList"></div>
+                </div>
+            </div>
+
+            <!-- ─── RIGHT PANEL ─────────────────────────────────── -->
+            <div class="problem-right">
+
+                <!-- Controls bar -->
+                <div class="controls-bar">
+                    <div class="controls-left">
+                        <select id="langSelect" class="lang-select" onchange="handleLanguageChange(this.value)">
+                            <option value="python">Python 3</option>
+                            <option value="cpp">C++</option>
+                            <option value="java">Java</option>
+                        </select>
+
+                        <button id="solutionBtn" class="brutal-btn" onclick="toggleSolution()">
+                            💡 Show Solution
+                        </button>
+                    </div>
+
+                    <button id="submitBtn" class="brutal-btn btn-green" onclick="handleSubmit()">
+                        ▶ Run &amp; Submit
+                    </button>
+                </div>
+
+                <!-- Solution warning -->
+                <div id="solutionWarning" class="solution-warning hidden">
+                    ⚠️ You are viewing the solution. Try solving it yourself first!
+                </div>
+
+                <!-- Monaco Editor Container -->
+                <div class="editor-container">
+                    <div id="monacoEditor" style="height:320px;"></div>
+                </div>
+
+                <!-- ─── NEW: Enter Your Output textarea ─────────── -->
+                <div class="output-section">
+                    <label for="userOutput">📝 Enter Your Output</label>
+                    <textarea id="userOutput" class="output-textarea"
+                        placeholder="Enter the expected output for each test case here.&#10;&#10;For multiple test cases, separate outputs with --- on its own line.&#10;&#10;Example:&#10;Hello, World!&#10;---&#10;Hello, World!&#10;---&#10;Hello, World!"></textarea>
+                    <p class="output-hint">Write your code above (for practice), then enter the output your code would
+                        produce here, and click "Run &amp; Submit".</p>
+                </div>
+
+                <!-- ─── Result Display ────────────────────────────── -->
+                <div id="resultCard" class="hidden brutal-card no-hover result-card"></div>
+
+                <!-- ─── Bottom Panel: Chat / Notes ────────────────── -->
+                <div class="brutal-card no-hover bottom-panel">
+                    <div class="bottom-tabs">
+                        <button id="tabChat" class="bottom-tab-btn active-chat" onclick="switchTab('chat')">
+                            💬 AI Tutor
+                        </button>
+                        <button id="tabNotes" class="bottom-tab-btn" onclick="switchTab('notes')">
+                            📝 Notes
+                        </button>
+                    </div>
+
+                    <!-- Chat Tab -->
+                    <div id="chatContent" class="tab-content active chat-panel">
+                        <div id="chatMessages" class="chat-messages">
+                            <!-- Welcome message -->
+                            <div class="chat-bubble-row">
+                                <div class="chat-avatar ai">AI</div>
+                                <div class="chat-bubble ai-bubble">
+                                    <p><strong>👋 Hey! I'm your AI tutor.</strong></p>
+                                    <p>I can help you with this problem. Ask me anything — I'll give you hints and guide
+                                        you, but I won't spoil the answer! 🎯</p>
+                                    <p style="margin-top:0.5rem; font-size:0.75rem; color:#6b7280;">Try: "How should I
+                                        approach this?" or "What concept do I need?"</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" class="chat-input" placeholder="Ask for a hint..."
+                                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+                            <button id="chatSendBtn" class="brutal-btn btn-purple" onclick="sendChat()">Send</button>
+                        </div>
+                    </div>
+
+                    <!-- Notes Tab -->
+                    <div id="notesContent" class="tab-content notes-panel">
+                        <div class="notes-header">
+                            <div>
+                                <p>📝 Your Notes</p>
+                                <p class="sub">Jot down your thoughts, approach, or key learnings.</p>
+                            </div>
+                            <div id="notesSaveStatus" class="notes-save-status"></div>
+                        </div>
+                        <textarea id="notesTextarea" class="notes-textarea"
+                            placeholder="Write your notes here...&#10;&#10;💡 Ideas:&#10;• What approach are you thinking of?&#10;• What concepts did you learn?&#10;• What tripped you up?&#10;• Key takeaways for next time"
+                            oninput="debounceSaveNotes()" onblur="saveCurrentNotes()"></textarea>
+                    </div>
+                </div>
+
+            </div><!-- /problem-right -->
+        </div><!-- /problem-layout -->
+    </main>
+
+    <!-- ─── Monaco Editor via CDN ───────────────────────────── -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+    <script src="app.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════
+        // STATE
+        // ═══════════════════════════════════════════════════════
+
+        let problem = null;
+        let currentLang = "python";
+        let monacoEditor = null;
+        let showingSolution = false;
+        let chatHistory = [];
+        let notesSaveTimer = null;
+        let isSubmitting = false;
+
+        // ═══════════════════════════════════════════════════════
+        // INIT
+        // ═══════════════════════════════════════════════════════
+
+        (function init() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+            if (!id) {
+                showNotFound();
+                return;
+            }
+
+            problem = getProblemById(id);
+            if (!problem) {
+                showNotFound();
+                return;
+            }
+
+            document.title = `${problem.title} — CodePractice`;
+            renderProblem();
+            renderPastSubmissions();
+            loadNotes();
+            initMonaco();
+        })();
+
+        // ═══════════════════════════════════════════════════════
+        // SHOW / HIDE HELPERS
+        // ═══════════════════════════════════════════════════════
+
+        function showNotFound() {
+            document.getElementById("loadingState").classList.add("hidden");
+            document.getElementById("notFoundState").classList.remove("hidden");
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // RENDER PROBLEM
+        // ═══════════════════════════════════════════════════════
+
+        function renderProblem() {
+            document.getElementById("loadingState").classList.add("hidden");
+            document.getElementById("problemContent").classList.remove("hidden");
+
+            document.getElementById("problemTitle").textContent = problem.title;
+            const badge = document.getElementById("problemBadge");
+            badge.textContent = problem.difficulty;
+            badge.className = `badge ${getBadgeClass(problem.difficulty)}`;
+
+            document.getElementById("problemBody").innerHTML = descriptionToHTML(problem.description);
+
+            // Example test case
+            const example = problem.testCases.find(tc => !tc.hidden);
+            if (example) {
+                const inputEl = document.getElementById("exampleInput");
+                if (example.input) {
+                    inputEl.innerHTML = `
+            <p class="test-case-label">Input:</p>
+            <pre class="test-case-pre">${example.input}</pre>`;
+                } else {
+                    inputEl.innerHTML = "";
+                }
+                document.getElementById("exampleOutput").textContent = example.expectedOutput;
+            }
+
+            // Hidden test count
+            const hiddenCount = problem.testCases.filter(tc => tc.hidden).length;
+            document.getElementById("hiddenTestsInfo").innerHTML =
+                `🔒 <strong>${hiddenCount} hidden test case${hiddenCount > 1 ? "s" : ""}</strong> will also be evaluated`;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // MONACO EDITOR
+        // ═══════════════════════════════════════════════════════
+
+        function initMonaco() {
+            require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" } });
+            require(["vs/editor/editor.main"], function () {
+                monacoEditor = monaco.editor.create(document.getElementById("monacoEditor"), {
+                    value: problem.starterCode.python || "",
+                    language: "python",
+                    theme: "vs-dark",
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    padding: { top: 16 },
+                    lineNumbers: "on",
+                    roundedSelection: false,
+                    scrollBeyondLastLine: false,
+                    wordWrap: "on",
+                    tabSize: 4,
+                    automaticLayout: true,
+                });
+            });
+        }
+
+        function setEditorValue(value, lang) {
+            if (monacoEditor) {
+                monacoEditor.setValue(value);
+                monaco.editor.setModelLanguage(monacoEditor.getModel(), getMonacoLang(lang));
+            }
+        }
+
+        function getEditorValue() {
+            return monacoEditor ? monacoEditor.getValue() : "";
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // LANGUAGE CHANGE
+        // ═══════════════════════════════════════════════════════
+
+        function handleLanguageChange(newLang) {
+            currentLang = newLang;
+            showingSolution = false;
+            document.getElementById("solutionBtn").textContent = "💡 Show Solution";
+            document.getElementById("solutionBtn").classList.remove("btn-yellow");
+            document.getElementById("solutionWarning").classList.add("hidden");
+
+            if (problem) {
+                setEditorValue(problem.starterCode[newLang] || "", newLang);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SHOW/HIDE SOLUTION
+        // ═══════════════════════════════════════════════════════
+
+        function toggleSolution() {
+            if (!problem) return;
+            const btn = document.getElementById("solutionBtn");
+            const warning = document.getElementById("solutionWarning");
+
+            if (!showingSolution) {
+                setEditorValue(problem.solution[currentLang] || "", currentLang);
+                showingSolution = true;
+                btn.textContent = "🔙 Hide Solution";
+                btn.classList.add("btn-yellow");
+                warning.classList.remove("hidden");
+            } else {
+                setEditorValue(problem.starterCode[currentLang] || "", currentLang);
+                showingSolution = false;
+                btn.textContent = "💡 Show Solution";
+                btn.classList.remove("btn-yellow");
+                warning.classList.add("hidden");
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // SUBMIT (Mock Evaluation)
+        // ═══════════════════════════════════════════════════════
+
+        function handleSubmit() {
+            if (!problem || isSubmitting) return;
+            isSubmitting = true;
+
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.textContent = "⏳ Running...";
+            submitBtn.disabled = true;
+
+            const userOutput = document.getElementById("userOutput").value;
+            const code = getEditorValue();
+
+            // Small delay for UX feel
+            setTimeout(() => {
+                const evalResult = evaluateSubmission(problem, userOutput);
+
+                // Store submission
+                const submission = {
+                    id: Date.now().toString(),
+                    problemId: problem.id,
+                    problemTitle: problem.title,
+                    code: code,
+                    language: currentLang,
+                    status: evalResult.status,
+                    output: evalResult.output,
+                    createdAt: new Date().toISOString(),
+                    user: getUsername(),
+                };
+                addSubmission(submission);
+
+                // Show result
+                renderResult(evalResult);
+
+                // Re-render past submissions
+                renderPastSubmissions();
+
+                isSubmitting = false;
+                submitBtn.textContent = "▶ Run & Submit";
+                submitBtn.disabled = false;
+            }, 400);
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // RENDER RESULT
+        // ═══════════════════════════════════════════════════════
+
+        function renderResult(result) {
+            const card = document.getElementById("resultCard");
+            card.classList.remove("hidden", "result-accepted", "result-wrong", "result-error");
+
+            let bgClass, icon, statusText;
+            if (result.status === "Accepted") {
+                bgClass = "result-accepted"; icon = "✅"; statusText = "Accepted!";
+            } else if (result.status === "Wrong Answer") {
+                bgClass = "result-wrong"; icon = "❌"; statusText = "Wrong Answer";
+            } else {
+                bgClass = "result-error"; icon = "⚠️"; statusText = "Runtime Error";
+            }
+            card.classList.add(bgClass);
+
+            let html = `
+        <div class="result-header">
+          <div class="result-header-left">
+            <span class="icon">${icon}</span>
+            <h3>${statusText}</h3>
+          </div>
+          <span class="result-counter">${result.passedCount}/${result.totalCount} passed</span>
+        </div>`;
+
+            if (result.testResults.length > 0) {
+                html += `<div class="test-results">`;
+                result.testResults.forEach((tr, i) => {
+                    html += `
+            <div class="test-result-item">
+              <span class="icon">${tr.passed ? "✅" : "❌"}</span>
+              <div style="flex:1">
+                <span class="label">Test #${i + 1}${tr.hidden ? " (Hidden)" : ""}</span>
+                ${!tr.hidden && !tr.passed ? `
+                  <div class="test-detail">
+                    <div>
+                      <span>Expected:</span>
+                      <pre>${tr.expected}</pre>
+                    </div>
+                    <div>
+                      <span>Your output:</span>
+                      <pre>${tr.actual}</pre>
+                    </div>
+                  </div>` : ""}
+              </div>
+            </div>`;
+                });
+                html += `</div>`;
+            } else if (result.output) {
+                html += `<pre class="result-output">${result.output}</pre>`;
+            }
+
+            card.innerHTML = html;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // PAST SUBMISSIONS
+        // ═══════════════════════════════════════════════════════
+
+        function renderPastSubmissions() {
+            if (!problem) return;
+            const subs = getSubmissions(problem.id);
+            const card = document.getElementById("pastSubmissionsCard");
+            const list = document.getElementById("pastSubmissionsList");
+
+            if (subs.length === 0) {
+                card.classList.add("hidden");
+                return;
+            }
+
+            card.classList.remove("hidden");
+            list.innerHTML = subs.slice(0, 5).map(sub => `
+        <div class="past-sub-item">
+          <span class="lang">${sub.language}</span>
+          <span class="status-badge ${getStatusBadgeClass(sub.status)}">${sub.status}</span>
+          <span class="time">${new Date(sub.createdAt).toLocaleTimeString()}</span>
+        </div>
+      `).join("");
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // TABS (Chat / Notes)
+        // ═══════════════════════════════════════════════════════
+
+        function switchTab(tab) {
+            const chatTab = document.getElementById("tabChat");
+            const notesTab = document.getElementById("tabNotes");
+            const chatContent = document.getElementById("chatContent");
+            const notesContent = document.getElementById("notesContent");
+
+            if (tab === "chat") {
+                chatTab.classList.add("active-chat");
+                notesTab.classList.remove("active-notes");
+                chatContent.classList.add("active");
+                notesContent.classList.remove("active");
+            } else {
+                chatTab.classList.remove("active-chat");
+                notesTab.classList.add("active-notes");
+                chatContent.classList.remove("active");
+                notesContent.classList.add("active");
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // AI CHATBOT
+        // ═══════════════════════════════════════════════════════
+
+        async function sendChat() {
+            const input = document.getElementById("chatInput");
+            const trimmed = input.value.trim();
+            if (!trimmed) return;
+
+            const sendBtn = document.getElementById("chatSendBtn");
+            sendBtn.disabled = true;
+            input.disabled = true;
+
+            // Add user message
+            chatHistory.push({ role: "user", content: trimmed });
+            appendChatBubble("user", trimmed);
+            input.value = "";
+
+            // Show typing indicator
+            const typingId = appendChatBubble("ai", '<span class="brutal-pulse" style="font-weight:700">Thinking... 🤔</span>', true);
+
+            // Get example test case for context
+            const example = problem.testCases.find(tc => !tc.hidden);
+            const expectedOutput = example ? example.expectedOutput : "";
+
+            const response = await sendChatMessage(
+                trimmed,
+                problem.title,
+                problem.description,
+                expectedOutput,
+                getEditorValue(),
+                chatHistory
+            );
+
+            // Remove typing indicator
+            const typingEl = document.getElementById(typingId);
+            if (typingEl) typingEl.remove();
+
+            if (response.reply) {
+                chatHistory.push({ role: "assistant", content: response.reply });
+                appendChatBubble("ai", response.reply);
+            } else {
+                appendChatBubble("ai", `⚠️ ${response.error || "Something went wrong. Try again!"}`);
+            }
+
+            sendBtn.disabled = false;
+            input.disabled = false;
+            input.focus();
+        }
+
+        function appendChatBubble(role, content, isTyping) {
+            const container = document.getElementById("chatMessages");
+            const id = "msg-" + Date.now() + Math.random();
+
+            const isUser = role === "user";
+            const div = document.createElement("div");
+            div.id = id;
+            div.className = `chat-bubble-row ${isUser ? "user" : ""}`;
+            div.innerHTML = `
+        <div class="chat-avatar ${isUser ? "user-avatar" : "ai"}">${isUser ? "U" : "AI"}</div>
+        <div class="chat-bubble ${isUser ? "user-bubble" : "ai-bubble"}">${isTyping ? content : escapeHtml(content)}</div>
+      `;
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ═══════════════════════════════════════════════════════
+        // NOTES
+        // ═══════════════════════════════════════════════════════
+
+        function loadNotes() {
+            if (!problem) return;
+            const notes = getNotes(problem.id);
+            document.getElementById("notesTextarea").value = notes;
+        }
+
+        function saveCurrentNotes() {
+            if (!problem) return;
+            const content = document.getElementById("notesTextarea").value;
+            saveNotes(problem.id, content);
+            const status = document.getElementById("notesSaveStatus");
+            status.innerHTML = '<span style="color:var(--brutal-green)">✓ Saved</span>';
+            setTimeout(() => { status.innerHTML = ""; }, 2000);
+        }
+
+        function debounceSaveNotes() {
+            clearTimeout(notesSaveTimer);
+            notesSaveTimer = setTimeout(saveCurrentNotes, 1500);
+        }
+    </script>
+
+</body>
+
+</html>

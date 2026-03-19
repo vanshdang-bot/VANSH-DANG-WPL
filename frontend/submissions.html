@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submissions — CodePractice</title>
+    <meta name="description" content="View your complete submission history on CodePractice.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ─── Navigation Bar ──────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-logo">⚡ CodePractice</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Problems</a>
+                <a href="submissions.html" class="nav-link active">Submissions</a>
+                <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Main Content ────────────────────────────────────── -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1>📋 Submissions</h1>
+            <p>Your complete submission history.</p>
+        </div>
+
+        <!-- Content Container -->
+        <div id="submissionsContainer"></div>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        (function renderSubmissions() {
+            const container = document.getElementById("submissionsContainer");
+            const submissions = getSubmissions();
+
+            // Empty state
+            if (submissions.length === 0) {
+                container.innerHTML = `
+          <div class="brutal-card no-hover empty-state">
+            <p style="font-size:2.5rem; margin-bottom:1rem;">🚀</p>
+            <p>No submissions yet!</p>
+            <p class="subtitle">Go solve some problems and come back here.</p>
+            <a href="index.html" class="brutal-btn btn-blue" style="margin-top:1rem; display:inline-block;">Browse Problems</a>
+          </div>`;
+                return;
+            }
+
+            // Submissions table
+            let rows = "";
+            submissions.forEach((sub, i) => {
+                rows += `
+          <tr class="${i % 2 === 0 ? '' : ''}">
+            <td>
+              <a href="problem.html?id=${sub.problemId}" class="problem-link">
+                ${sub.problemTitle || 'Problem #' + sub.problemId}
+              </a>
+            </td>
+            <td>
+              <span class="lang-label">${getLangIcon(sub.language)} ${sub.language.toUpperCase()}</span>
+            </td>
+            <td>
+              <span class="status-cell ${getStatusBadgeClass(sub.status)}">
+                ${getStatusIcon(sub.status)} ${sub.status}
+              </span>
+            </td>
+            <td class="time-cell">
+              ${new Date(sub.createdAt).toLocaleString()}
+            </td>
+          </tr>`;
+            });
+
+            container.innerHTML = `
+        <div class="brutal-card no-hover" style="overflow:hidden;">
+          <table class="submissions-table">
+            <thead>
+              <tr>
+                <th>Problem</th>
+                <th>Language</th>
+                <th>Status</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+        })();
+    </script>
+
+</body>
+
+</html>

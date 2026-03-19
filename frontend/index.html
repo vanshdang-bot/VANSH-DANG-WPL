@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodePractice — Learn to Code</title>
+  <meta name="description" content="A beginner-friendly coding practice platform. Solve problems, submit code, and track your progress.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ─── Navigation Bar ──────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo">⚡ CodePractice</a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active">Problems</a>
+        <a href="submissions.html" class="nav-link">Submissions</a>
+        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── Main Content ────────────────────────────────────── -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <h1>🧩 Problems</h1>
+      <p>Pick a challenge and start coding!</p>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="filter-bar" id="filterBar">
+      <button class="brutal-btn btn-dark" data-filter="All" onclick="filterProblems('All')">All</button>
+      <button class="brutal-btn" data-filter="Easy" onclick="filterProblems('Easy')">Easy</button>
+      <button class="brutal-btn" data-filter="Medium" onclick="filterProblems('Medium')">Medium</button>
+      <button class="brutal-btn" data-filter="Hard" onclick="filterProblems('Hard')">Hard</button>
+    </div>
+
+    <!-- Problem Cards -->
+    <div class="problem-list" id="problemList"></div>
+
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    // ─── State ───────────────────────────────────────────
+    let currentFilter = "All";
+
+    // ─── Render problems ─────────────────────────────────
+    function renderProblems(filter) {
+      const problems = getProblems(filter);
+      const container = document.getElementById("problemList");
+
+      if (problems.length === 0) {
+        container.innerHTML = `
+          <div class="brutal-card no-hover empty-state">
+            <p>No problems found 🤔</p>
+            <p class="subtitle">Try changing the difficulty filter.</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = problems.map((problem, index) => `
+        <a href="problem.html?id=${problem.id}">
+          <div class="brutal-card problem-card ${getAccentClass(problem.difficulty)}">
+            <div class="problem-card-left">
+              <span class="problem-number">${PROBLEMS.indexOf(problem) + 1}</span>
+              <div>
+                <h2>${problem.title}</h2>
+                <p class="problem-id">Problem #${problem.id}</p>
+              </div>
+            </div>
+            <span class="badge ${getBadgeClass(problem.difficulty)}">${problem.difficulty}</span>
+          </div>
+        </a>
+      `).join("");
+    }
+
+    // ─── Filter click handler ────────────────────────────
+    function filterProblems(filter) {
+      currentFilter = filter;
+
+      // Update active button styling
+      document.querySelectorAll("#filterBar button").forEach(btn => {
+        if (btn.dataset.filter === filter) {
+          btn.classList.add("btn-dark");
+        } else {
+          btn.classList.remove("btn-dark");
+        }
+      });
+
+      renderProblems(filter);
+    }
+
+    // ─── Initialize ──────────────────────────────────────
+    renderProblems("All");
+  </script>
+
+</body>
+</html>

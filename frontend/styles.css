@@ -1,0 +1,1066 @@
+/* ══════════════════════════════════════════════════════════════════
+   CodePractice — Neo-Brutalism Design System
+   Pure CSS (converted from Tailwind + globals.css)
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ─── Google Font ─────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ─── CSS Custom Properties ───────────────────────────────────── */
+:root {
+    --brutal-bg: #FEF9EF;
+    --brutal-pink: #FF6B9D;
+    --brutal-yellow: #FFD93D;
+    --brutal-green: #6BCB77;
+    --brutal-blue: #4D96FF;
+    --brutal-purple: #9B5DE5;
+    --brutal-red: #FF6B6B;
+    --brutal-orange: #FFA552;
+    --brutal-dark: #1A1A2E;
+    --brutal-border: #1A1A2E;
+}
+
+/* ─── Reset & Base ────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background-color: var(--brutal-bg);
+    color: var(--brutal-dark);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--brutal-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--brutal-dark);
+    border-radius: 0;
+}
+
+/* ─── Navigation ──────────────────────────────────────────────── */
+.navbar {
+    background-color: var(--brutal-blue);
+    border-bottom: 3px solid var(--brutal-border);
+    padding: 1rem 1.5rem;
+}
+
+.navbar-inner {
+    max-width: 80rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.025em;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    border: 3px solid transparent;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    color: white;
+    border-radius: 0.375rem;
+    transition: all 0.15s;
+    font-size: 0.875rem;
+}
+
+.nav-link:hover {
+    border-color: var(--brutal-dark);
+    box-shadow: 3px 3px 0px var(--brutal-dark);
+    background-color: var(--brutal-yellow);
+    color: var(--brutal-dark);
+}
+
+.nav-link.active {
+    border-color: var(--brutal-dark);
+    background-color: var(--brutal-yellow);
+    color: var(--brutal-dark);
+    box-shadow: 3px 3px 0px var(--brutal-dark);
+}
+
+/* ─── Main Container ──────────────────────────────────────────── */
+.main-content {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* ─── Neo-Brutalism Card ──────────────────────────────────────── */
+.brutal-card {
+    border: 3px solid var(--brutal-dark);
+    box-shadow: 6px 6px 0px var(--brutal-dark);
+    background: white;
+    border-radius: 0.5rem;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.brutal-card:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 8px 8px 0px var(--brutal-dark);
+}
+
+.brutal-card.no-hover:hover {
+    transform: none;
+    box-shadow: 6px 6px 0px var(--brutal-dark);
+}
+
+/* ─── Neo-Brutalism Button ────────────────────────────────────── */
+.brutal-btn {
+    border: 3px solid var(--brutal-dark);
+    box-shadow: 4px 4px 0px var(--brutal-dark);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: transform 0.1s, box-shadow 0.1s;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-family: 'Space Grotesk', sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: white;
+    color: var(--brutal-dark);
+}
+
+.brutal-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--brutal-dark);
+}
+
+.brutal-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px var(--brutal-dark);
+}
+
+.brutal-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.brutal-btn.btn-green {
+    background-color: var(--brutal-green);
+}
+
+.brutal-btn.btn-blue {
+    background-color: var(--brutal-blue);
+    color: white;
+}
+
+.brutal-btn.btn-purple {
+    background-color: var(--brutal-purple);
+    color: white;
+}
+
+.brutal-btn.btn-yellow {
+    background-color: var(--brutal-yellow);
+}
+
+.brutal-btn.btn-red {
+    background-color: var(--brutal-red);
+}
+
+.brutal-btn.btn-dark {
+    background-color: var(--brutal-dark);
+    color: white;
+}
+
+/* ─── Difficulty Badges ───────────────────────────────────────── */
+.badge {
+    border: 2px solid var(--brutal-dark);
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.badge-easy {
+    background-color: var(--brutal-green);
+    color: var(--brutal-dark);
+}
+
+.badge-medium {
+    background-color: var(--brutal-yellow);
+    color: var(--brutal-dark);
+}
+
+.badge-hard {
+    background-color: var(--brutal-red);
+    color: var(--brutal-dark);
+}
+
+/* ─── Status Badges ───────────────────────────────────────────── */
+.status-accepted {
+    background-color: var(--brutal-green);
+    color: var(--brutal-dark);
+    border: 2px solid var(--brutal-dark);
+}
+
+.status-wrong {
+    background-color: var(--brutal-red);
+    color: var(--brutal-dark);
+    border: 2px solid var(--brutal-dark);
+}
+
+.status-error {
+    background-color: var(--brutal-orange);
+    color: var(--brutal-dark);
+    border: 2px solid var(--brutal-dark);
+}
+
+/* ─── Pulse Animation ─────────────────────────────────────────── */
+@keyframes brutal-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.brutal-pulse {
+    animation: brutal-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Page Header ─────────────────────────────────────────────── */
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    font-size: 1.125rem;
+    color: #6b7280;
+}
+
+/* ─── Filter Buttons ──────────────────────────────────────────── */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ─── Problem Cards (List) ────────────────────────────────────── */
+.problem-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.problem-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    cursor: pointer;
+}
+
+.problem-card.accent-easy {
+    border-left: 6px solid var(--brutal-green);
+}
+
+.problem-card.accent-medium {
+    border-left: 6px solid var(--brutal-yellow);
+}
+
+.problem-card.accent-hard {
+    border-left: 6px solid var(--brutal-red);
+}
+
+.problem-card-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.problem-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 2px solid var(--brutal-dark);
+    border-radius: 0.375rem;
+    background: var(--brutal-bg);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.problem-card h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.problem-card .problem-id {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* ─── Empty State ─────────────────────────────────────────────── */
+.empty-state {
+    padding: 3rem;
+    text-align: center;
+}
+
+.empty-state p {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.empty-state .subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+/* ─── Two-Panel Layout (Problem Page) ─────────────────────────── */
+.problem-layout {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.problem-left {
+    width: 40%;
+    flex-shrink: 0;
+}
+
+.problem-right {
+    width: 60%;
+    flex-grow: 1;
+}
+
+@media (max-width: 1024px) {
+    .problem-layout {
+        flex-direction: column;
+    }
+
+    .problem-left,
+    .problem-right {
+        width: 100%;
+    }
+}
+
+/* ─── Problem Description ─────────────────────────────────────── */
+.problem-desc {
+    padding: 1.5rem;
+}
+
+.problem-desc h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.problem-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.problem-body {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.problem-body h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 1rem 0 0.5rem;
+}
+
+.problem-body pre {
+    background: var(--brutal-bg);
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    overflow-x: auto;
+}
+
+.problem-body code {
+    background: #f3f4f6;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.8125rem;
+}
+
+.problem-body strong {
+    font-weight: 700;
+}
+
+/* ─── Test Case Box ───────────────────────────────────────────── */
+.test-case-box {
+    border: 2px solid var(--brutal-dark);
+    border-radius: 0.375rem;
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.test-case-box h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.test-case-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    margin-bottom: 0.25rem;
+}
+
+.test-case-pre {
+    background: var(--brutal-bg);
+    border: 1px solid #e5e7eb;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    font-family: monospace;
+    margin-bottom: 0.5rem;
+    white-space: pre-wrap;
+}
+
+.hidden-tests {
+    border: 2px dashed #d1d5db;
+    border-radius: 0.375rem;
+    background: #f9fafb;
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* ─── Controls Bar ────────────────────────────────────────────── */
+.controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.controls-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.lang-select {
+    border: 3px solid var(--brutal-dark);
+    box-shadow: 4px 4px 0px var(--brutal-dark);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    font-family: 'Space Grotesk', sans-serif;
+    background: white;
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* ─── Editor Container ────────────────────────────────────────── */
+.editor-container {
+    border: 3px solid var(--brutal-dark);
+    box-shadow: 6px 6px 0px var(--brutal-dark);
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
+
+/* ─── Output Textarea (NEW — for mock judging) ────────────────── */
+.output-section {
+    margin-top: 1rem;
+}
+
+.output-section label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.output-textarea {
+    width: 100%;
+    min-height: 100px;
+    border: 3px solid var(--brutal-dark);
+    box-shadow: 4px 4px 0px var(--brutal-dark);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    resize: vertical;
+    background: white;
+    transition: box-shadow 0.1s;
+}
+
+.output-textarea:focus {
+    outline: none;
+    box-shadow: 6px 6px 0px var(--brutal-dark);
+}
+
+.output-textarea::placeholder {
+    color: #9ca3af;
+}
+
+.output-hint {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.375rem;
+}
+
+/* ─── Solution Warning ────────────────────────────────────────── */
+.solution-warning {
+    border: 2px solid var(--brutal-yellow);
+    background: rgba(255, 217, 61, 0.2);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+/* ─── Result Display ──────────────────────────────────────────── */
+.result-card {
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.result-card.result-accepted {
+    background-color: var(--brutal-green);
+}
+
+.result-card.result-wrong {
+    background-color: var(--brutal-red);
+}
+
+.result-card.result-error {
+    background-color: var(--brutal-orange);
+}
+
+.result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+}
+
+.result-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.result-header-left .icon {
+    font-size: 1.5rem;
+}
+
+.result-header-left h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.result-counter {
+    border: 2px solid var(--brutal-dark);
+    background: white;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.test-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.test-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 2px solid var(--brutal-dark);
+    background: white;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.test-result-item .icon {
+    font-size: 1.125rem;
+}
+
+.test-result-item .label {
+    font-weight: 700;
+}
+
+.test-detail {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.test-detail span {
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.test-detail pre {
+    background: #f3f4f6;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    margin-top: 0.25rem;
+    overflow-x: auto;
+}
+
+.result-output {
+    border: 2px solid var(--brutal-dark);
+    background: white;
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+/* ─── Past Submissions (Problem Page) ─────────────────────────── */
+.past-submissions {
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.past-submissions h3 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.past-sub-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid var(--brutal-dark);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.past-sub-item .lang {
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.past-sub-item .status-badge {
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.past-sub-item .time {
+    color: #6b7280;
+}
+
+/* ─── Bottom Panel (Chat / Notes tabs) ────────────────────────── */
+.bottom-panel {
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.bottom-tabs {
+    display: flex;
+    border-bottom: 3px solid var(--brutal-dark);
+}
+
+.bottom-tab-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    font-family: 'Space Grotesk', sans-serif;
+    background: white;
+    color: var(--brutal-dark);
+}
+
+.bottom-tab-btn:not(:first-child) {
+    border-left: 3px solid var(--brutal-dark);
+}
+
+.bottom-tab-btn.active-chat {
+    background-color: var(--brutal-purple);
+    color: white;
+}
+
+.bottom-tab-btn.active-notes {
+    background-color: var(--brutal-yellow);
+    color: var(--brutal-dark);
+}
+
+.bottom-tab-btn:hover {
+    opacity: 0.85;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ─── Chat Panel ──────────────────────────────────────────────── */
+.chat-panel {
+    height: 350px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.chat-bubble-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.chat-bubble-row.user {
+    flex-direction: row-reverse;
+}
+
+.chat-avatar {
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--brutal-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.chat-avatar.ai {
+    background-color: var(--brutal-purple);
+    color: white;
+}
+
+.chat-avatar.user-avatar {
+    background-color: var(--brutal-blue);
+    color: white;
+}
+
+.chat-bubble {
+    border: 2px solid var(--brutal-dark);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    max-width: 80%;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+.chat-bubble.ai-bubble {
+    background: rgba(155, 93, 229, 0.1);
+}
+
+.chat-bubble.user-bubble {
+    background: rgba(77, 150, 255, 0.1);
+}
+
+.chat-bubble strong {
+    font-weight: 700;
+}
+
+.chat-input-area {
+    border-top: 3px solid var(--brutal-dark);
+    background: white;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.chat-input {
+    flex: 1;
+    border: 2px solid var(--brutal-dark);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.chat-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--brutal-purple);
+}
+
+/* ─── Notes Panel ─────────────────────────────────────────────── */
+.notes-panel {
+    height: 350px;
+}
+
+.notes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--brutal-dark);
+    background: white;
+    padding: 0.75rem 1rem;
+}
+
+.notes-header p {
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.notes-header .sub {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.notes-save-status {
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.notes-textarea {
+    flex: 1;
+    resize: none;
+    background: var(--brutal-bg);
+    padding: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    border: none;
+}
+
+.notes-textarea:focus {
+    outline: none;
+}
+
+/* ─── Submissions Table ───────────────────────────────────────── */
+.submissions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.submissions-table thead tr {
+    border-bottom: 3px solid var(--brutal-dark);
+    background: var(--brutal-bg);
+}
+
+.submissions-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.submissions-table tbody tr {
+    border-bottom: 2px solid var(--brutal-dark);
+    transition: background-color 0.15s;
+}
+
+.submissions-table tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.submissions-table tbody tr:hover {
+    background: var(--brutal-bg);
+}
+
+.submissions-table td {
+    padding: 1rem 1.5rem;
+}
+
+.submissions-table .problem-link {
+    font-weight: 700;
+    color: var(--brutal-dark);
+}
+
+.submissions-table .problem-link:hover {
+    color: var(--brutal-blue);
+}
+
+.submissions-table .lang-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.submissions-table .status-cell {
+    display: inline-block;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.submissions-table .time-cell {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* ─── Leaderboard Table ───────────────────────────────────────── */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table thead tr {
+    border-bottom: 3px solid var(--brutal-dark);
+    background: var(--brutal-dark);
+    color: white;
+}
+
+.leaderboard-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.leaderboard-table tbody tr {
+    border-bottom: 2px solid var(--brutal-dark);
+    transition: background-color 0.15s;
+}
+
+.leaderboard-table tbody tr:hover {
+    background: var(--brutal-bg);
+}
+
+.leaderboard-table td {
+    padding: 1rem 1.5rem;
+}
+
+.leaderboard-table .rank-cell {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.leaderboard-table .user-cell {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.row-gold {
+    background-color: var(--brutal-yellow);
+}
+
+.row-silver {
+    background-color: #f3f4f6;
+}
+
+.row-bronze {
+    background-color: rgba(255, 165, 82, 0.3);
+}
+
+/* ─── Loading skeleton ────────────────────────────────────────── */
+.skeleton {
+    height: 6rem;
+    border-radius: 0.5rem;
+    background: #f3f4f6;
+    margin-bottom: 1rem;
+}
+
+/* ─── Hidden utility ──────────────────────────────────────────── */
+.hidden {
+    display: none !important;
+}
+
+/* ─── Responsive mobile adjustments ───────────────────────────── */
+@media (max-width: 640px) {
+    .navbar-inner {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .nav-links {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .page-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .problem-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .controls-bar {
+        flex-direction: column;
+    }
+}

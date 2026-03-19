@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard — CodePractice</title>
+    <meta name="description" content="See who has solved the most problems on CodePractice.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ─── Navigation Bar ──────────────────────────────────── -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="index.html" class="navbar-logo">⚡ CodePractice</a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Problems</a>
+                <a href="submissions.html" class="nav-link">Submissions</a>
+                <a href="leaderboard.html" class="nav-link active">Leaderboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ─── Main Content ────────────────────────────────────── -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1>🏆 Leaderboard</h1>
+            <p>Who has solved the most problems?</p>
+        </div>
+
+        <!-- Content Container -->
+        <div id="leaderboardContainer"></div>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        (function renderLeaderboard() {
+            const container = document.getElementById("leaderboardContainer");
+            const entries = getLeaderboard();
+
+            // Empty state
+            if (entries.length === 0) {
+                container.innerHTML = `
+          <div class="brutal-card no-hover empty-state">
+            <p style="font-size:2.5rem; margin-bottom:1rem;">🏅</p>
+            <p>No one on the leaderboard yet!</p>
+            <p class="subtitle">Be the first to solve a problem and claim the top spot.</p>
+          </div>`;
+                return;
+            }
+
+            // Leaderboard table
+            let rows = "";
+            entries.forEach(entry => {
+                rows += `
+          <tr class="${getRowClass(entry.rank)}">
+            <td class="rank-cell">${getRankDisplay(entry.rank)}</td>
+            <td class="user-cell">${entry.user}</td>
+            <td>
+              <span class="brutal-btn btn-green" style="cursor:default; font-size:0.875rem;">
+                ${entry.solved} solved
+              </span>
+            </td>
+          </tr>`;
+            });
+
+            container.innerHTML = `
+        <div class="brutal-card no-hover" style="overflow:hidden;">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>User</th>
+                <th>Problems Solved</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+        })();
+    </script>
+
+</body>
+
+</html>
