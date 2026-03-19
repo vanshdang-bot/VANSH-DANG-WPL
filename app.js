@@ -17,7 +17,13 @@
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 
-const GROQ_API_KEY = ""; // Put your Groq API key here
+let GROQ_API_KEY = localStorage.getItem("groq_key");
+if (!GROQ_API_KEY) {
+    GROQ_API_KEY = prompt("Please enter your Groq API Key to enable the AI Tutor and Auto-Grader:");
+    if (GROQ_API_KEY) {
+        localStorage.setItem("groq_key", GROQ_API_KEY);
+    }
+}
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const STORAGE_KEYS = {
     submissions: "codepractice_submissions",
@@ -238,20 +244,15 @@ function saveNotes(problemId, content) {
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Evaluate user's output against all test cases.
- * The user enters their output for EACH test case,
- * separated by "---" on its own line.
- * 
- * If only one block is entered, it's compared to ALL test cases.
+ * Evaluate user's code against all test cases using Groq AI.
  */
-function evaluateSubmission(problem, userOutputRaw) {
+async function evaluateWithAI(problem, code, language) {
     const testCases = problem.testCases;
 
-    // If output is empty / whitespace only
-    if (!userOutputRaw || userOutputRaw.trim() === "") {
+    if (!code || code.trim() === "") {
         return {
-            status: "Runtime Error",
-            output: "No output provided. Please enter your output.",
+            status: "Wrong Answer",
+            output: "No code provided.",
             testResults: testCases.map(tc => ({
                 passed: false,
                 input: tc.hidden ? "(hidden)" : tc.input,
@@ -264,47 +265,92 @@ function evaluateSubmission(problem, userOutputRaw) {
         };
     }
 
-    // Split user output by "---" delimiter for multi-test-case output
-    const userOutputs = userOutputRaw.split(/^---$/m).map(s => s.trim());
+    if (!GROQ_API_KEY) {
+        throw new Error("Groq API key not configured.");
+    }
 
-    const results = [];
-    let allPassed = true;
+    const testCasesText = testCases.map((tc, i) =>
+        `Test ${i + 1}:\nInput: ${tc.input}\nExpected Output: ${tc.expectedOutput}`
+    ).join("\n\n");
 
-    for (let i = 0; i < testCases.length; i++) {
-        const tc = testCases[i];
-        // Use the i-th user output block, or fall back to the first/only one
-        const userOut = (userOutputs[i] !== undefined ? userOutputs[i] : userOutputs[0]) || "";
-        const expected = tc.expectedOutput.trim();
-        const passed = userOut === expected;
+    const prompt = `You are an auto-grader for a coding platform.
+Problem Title: ${problem.title}
+Problem Description: ${problem.description}
 
-        if (!passed) allPassed = false;
+Here is the student's code in ${language}:
+\`\`\`
+${code}
+\`\`\`
 
-        results.push({
-            passed,
-            input: tc.hidden ? "(hidden)" : tc.input,
-            expected: tc.hidden ? "(hidden)" : expected,
-            actual: tc.hidden && passed ? "✓" : userOut || "(empty)",
-            hidden: tc.hidden,
+Here are the test cases:
+${testCasesText}
+
+Evaluate the student's code against each test case. You must determine if the code correctly solves the problem for each input.
+You MUST reply with ONLY a pure JSON array containing the results, with no markdown formatting, no backticks, and no conversational text.
+The JSON array MUST contain exactly ${testCases.length} objects in the same order as the test cases.
+Each object must have exactly these keys: "passed" (boolean) and "actual_output" (string with the output the code would produce).
+
+Example output:
+[
+  { "passed": true, "actual_output": "Hello World" },
+  { "passed": false, "actual_output": "Error or Wrong Output" }
+]`;
+
+    try {
+        const response = await fetch(GROQ_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${GROQ_API_KEY}`,
+            },
+            body: JSON.stringify({
+                model: "llama-3.3-70b-versatile",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.1,
+            }),
         });
-    }
 
-    let status, output;
-    if (allPassed) {
-        status = "Accepted";
-        output = `All ${testCases.length} test cases passed!`;
-    } else {
-        status = "Wrong Answer";
-        const failed = results.find(r => !r.passed);
-        output = failed ? failed.actual : "(no output)";
-    }
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+        }
 
-    return {
-        status,
-        output,
-        testResults: results,
-        passedCount: results.filter(r => r.passed).length,
-        totalCount: testCases.length,
-    };
+        const data = await response.json();
+        const replyText = data.choices?.[0]?.message?.content || "";
+
+        // Try to parse the JSON. It might have markdown codeblocks around it.
+        const cleanedText = replyText.replace(/```json/g, "").replace(/```/g, "").trim();
+        const parsedResults = JSON.parse(cleanedText);
+
+        const results = [];
+        let allPassed = true;
+
+        for (let i = 0; i < testCases.length; i++) {
+            const tc = testCases[i];
+            const result = parsedResults[i] || { passed: false, actual_output: "Failed to parse API result" };
+
+            if (!result.passed) allPassed = false;
+
+            results.push({
+                passed: result.passed,
+                input: tc.hidden ? "(hidden)" : tc.input,
+                expected: tc.hidden ? "(hidden)" : tc.expectedOutput,
+                actual: tc.hidden && result.passed ? "✓" : result.actual_output,
+                hidden: tc.hidden,
+            });
+        }
+
+        return {
+            status: allPassed ? "Accepted" : "Wrong Answer",
+            output: allPassed ? `All ${testCases.length} test cases passed!` : "Your code failed on one or more test cases.",
+            testResults: results,
+            passedCount: results.filter(r => r.passed).length,
+            totalCount: testCases.length,
+        };
+
+    } catch (err) {
+        console.error("AI Evaluation Error:", err);
+        throw err;
+    }
 }
 
 

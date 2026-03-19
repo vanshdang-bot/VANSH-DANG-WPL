@@ -102,15 +102,7 @@
                     <div id="monacoEditor" style="height:320px;"></div>
                 </div>
 
-                <!-- ─── NEW: Enter Your Output textarea ─────────── -->
-                <div class="output-section">
-                    <label for="userOutput">📝 Enter Your Output</label>
-                    <textarea id="userOutput" class="output-textarea"
-                        placeholder="Enter the expected output for each test case here.&#10;&#10;For multiple test cases, separate outputs with --- on its own line.&#10;&#10;Example:&#10;Hello, World!&#10;---&#10;Hello, World!&#10;---&#10;Hello, World!"></textarea>
-                    <p class="output-hint">Write your code above (for practice), then enter the output your code would
-                        produce here, and click "Run &amp; Submit".</p>
-                </div>
-
+                <!-- Removed manual output textarea -->
                 <!-- ─── Result Display ────────────────────────────── -->
                 <div id="resultCard" class="hidden brutal-card no-hover result-card"></div>
 
@@ -133,10 +125,8 @@
                                 <div class="chat-avatar ai">AI</div>
                                 <div class="chat-bubble ai-bubble">
                                     <p><strong>👋 Hey! I'm your AI tutor.</strong></p>
-                                    <p>I can help you with this problem. Ask me anything — I'll give you hints and guide
-                                        you, but I won't spoil the answer! 🎯</p>
-                                    <p style="margin-top:0.5rem; font-size:0.75rem; color:#6b7280;">Try: "How should I
-                                        approach this?" or "What concept do I need?"</p>
+                                    <p>I can help you with this problem. Ask me anything — I'll give you hints and guide you, but I won't spoil the answer! 🎯</p>
+                                    <p style="margin-top:0.5rem; font-size:0.75rem; color:#6b7280;">Try: "How should I approach this?" or "What concept do I need?"</p>
                                 </div>
                             </div>
                         </div>
@@ -331,20 +321,18 @@
         // SUBMIT (Mock Evaluation)
         // ═══════════════════════════════════════════════════════
 
-        function handleSubmit() {
+        async function handleSubmit() {
             if (!problem || isSubmitting) return;
             isSubmitting = true;
 
             const submitBtn = document.getElementById("submitBtn");
-            submitBtn.textContent = "⏳ Running...";
+            submitBtn.textContent = "⏳ Grading...";
             submitBtn.disabled = true;
 
-            const userOutput = document.getElementById("userOutput").value;
             const code = getEditorValue();
 
-            // Small delay for UX feel
-            setTimeout(() => {
-                const evalResult = evaluateSubmission(problem, userOutput);
+            try {
+                const evalResult = await evaluateWithAI(problem, code, currentLang);
 
                 // Store submission
                 const submission = {
@@ -365,11 +353,19 @@
 
                 // Re-render past submissions
                 renderPastSubmissions();
-
+            } catch (err) {
+                renderResult({
+                    status: "Runtime Error",
+                    output: "Evaluation failed. Did you configure GROQ_API_KEY in app.js?",
+                    testResults: [],
+                    passedCount: 0,
+                    totalCount: problem.testCases.length
+                });
+            } finally {
                 isSubmitting = false;
                 submitBtn.textContent = "▶ Run & Submit";
                 submitBtn.disabled = false;
-            }, 400);
+            }
         }
 
         // ═══════════════════════════════════════════════════════

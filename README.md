@@ -1,55 +1,48 @@
 # ⚡ CodePractice
 
-A beginner-friendly coding practice platform — like a simplified LeetCode. Built with **Next.js**, **Tailwind CSS** (Neo-Brutalism UI), **Monaco Editor**, and **Judge0 API**.
+A beginner-friendly coding practice platform — like a simplified LeetCode.
 
 ![Neo-Brutalism UI](https://img.shields.io/badge/UI-Neo%20Brutalism-FF6B9D?style=for-the-badge)
-![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge)
-![TypeScript](https://img.shields.io/badge/TypeScript-blue?style=for-the-badge)
+![HTML/JS](https://img.shields.io/badge/Tech-Vanilla%20JS-yellow?style=for-the-badge)
 
 ---
 
 ## ✨ Features
 
 - 🧩 **Problem List** — Browse coding challenges filtered by difficulty (Easy / Medium / Hard)
-- 💻 **Code Editor** — Write code in Python, C++, or Java using Monaco Editor
-- ▶️ **Code Execution** — Submit code and get instant results via Judge0 API
-- 📋 **Submissions** — View your complete submission history
+- 💻 **Code Editor** — Write code using Monaco Editor natively in the browser
+- ▶️ **AI Auto-Grader** — Submit code and get instant test results via Groq API (LLaMA 3)
+- 📋 **Submissions** — View your complete submission history (stored locally)
 - 🏆 **Leaderboard** — See who has solved the most problems
+- 💬 **AI Tutor** — Get hints and help without spoiling the answer
 
 ---
 
 ## 🚀 Getting Started
 
+This is a **pure frontend application** (HTML, CSS, JavaScript). No build steps or backend servers are required!
+
 ### Prerequisites
+- A free **Groq API key** from [GroqCloud](https://console.groq.com/keys)
 
-- **Node.js** 18+ installed
-- A free **Judge0 API key** from [RapidAPI](https://rapidapi.com/judge0-official/api/judge0-ce)
+### 1. Configure Configuration
+Open `app.js` and paste your Groq API key:
+```javascript
+const GROQ_API_KEY = "your_groq_api_key_here";
+```
 
-### 1. Install Dependencies
-
+### 2. Run Locally
+You can start a simple static file server.
+Using Node.js:
 ```bash
-cd codepractice
-npm install
+npx serve .
 ```
 
-### 2. Set Up Environment Variables
-
-Edit the `.env.local` file in the project root:
-
-```
-JUDGE0_API_KEY=your_rapidapi_key_here
-JUDGE0_API_URL=https://judge0-ce.p.rapidapi.com
-```
-
-> 💡 Sign up at [RapidAPI](https://rapidapi.com/judge0-official/api/judge0-ce) to get a free API key.
-
-### 3. Run the Dev Server
-
+Using Python:
 ```bash
-npm run dev
+python3 -m http.server 8000
 ```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:8000](http://localhost:8000) (or whichever port your server uses) in your browser.
 
 ---
 
@@ -57,39 +50,13 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ```
 codepractice/
-├── data/
-│   ├── problems.json        # All coding problems
-│   └── submissions.json     # Submission history
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── problems/    # GET /api/problems
-│   │   │   ├── submit/      # POST /api/submit
-│   │   │   ├── submissions/ # GET /api/submissions
-│   │   │   └── leaderboard/ # GET /api/leaderboard
-│   │   ├── problem/[id]/    # Problem page with editor
-│   │   ├── submissions/     # Submissions history page
-│   │   ├── leaderboard/     # Leaderboard page
-│   │   ├── layout.tsx       # Root layout + navbar
-│   │   ├── page.tsx         # Home page (problem list)
-│   │   └── globals.css      # Neo-Brutalism styles
-│   └── lib/
-│       └── data.ts          # JSON file helpers
-├── .env.local               # API keys (not committed)
-└── package.json
+├── index.html           # Home page (problem list)
+├── problem.html         # Problem solver page with editor & AI tutor
+├── submissions.html     # Submissions history page
+├── leaderboard.html     # Leaderboard page
+├── styles.css           # Neo-Brutalism styling
+└── app.js               # Core logic, problem data, & Groq integration
 ```
-
----
-
-## 🔌 API Routes
-
-| Method | Endpoint              | Description                    |
-|--------|-----------------------|--------------------------------|
-| GET    | `/api/problems`       | List all problems              |
-| GET    | `/api/problems/:id`   | Get a single problem           |
-| POST   | `/api/submit`         | Submit code for execution      |
-| GET    | `/api/submissions`    | Get submission history         |
-| GET    | `/api/leaderboard`    | Get leaderboard rankings       |
 
 ---
 
@@ -108,12 +75,10 @@ The UI uses a **Neo-Brutalism** design with:
 
 | Technology     | Purpose                |
 |----------------|------------------------|
-| Next.js 15     | Full-stack framework   |
-| Tailwind CSS   | Styling                |
-| Monaco Editor  | Code editor            |
-| Judge0 API     | Code execution         |
-| JSON files     | Simple data storage    |
-| TypeScript     | Type safety            |
+| HTML/CSS/JS    | Core frontend          |
+| Monaco Editor  | Code editor widget     |
+| Groq API       | Auto-grading & Tutor   |
+| LocalStorage   | User data persistence  |
 
 ---
 
