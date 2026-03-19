@@ -1,62 +1,83 @@
 /**
  * POST /api/submit
  * 
- * Receives user code, sends it to Judge0 for execution,
- * compares output with expected output, and stores the submission.
- * 
- * Body: { problemId, code, language, user? }
+ * Executes user code LOCALLY against ALL test cases (1 example + 2 hidden).
+ * Runs using python3, g++, or javac — no external API needed.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { getProblemById, addSubmission, type Submission } from "@/lib/data";
+import { exec } from "child_process";
+import { writeFileSync, mkdirSync, unlinkSync, existsSync } from "fs";
+import path from "path";
+import { promisify } from "util";
 
-// Judge0 language IDs
-const LANGUAGE_IDS: Record<string, number> = {
-    python: 71,   // Python 3
-    cpp: 54,      // C++ (GCC 9.2.0)
-    java: 62,     // Java (OpenJDK 13)
-};
-
-// Judge0 API config
-const JUDGE0_URL = process.env.JUDGE0_API_URL || "https://judge0-ce.p.rapidapi.com";
-const JUDGE0_KEY = process.env.JUDGE0_API_KEY || "";
+const execAsync = promisify(exec);
+const TMP_DIR = path.join(process.cwd(), ".tmp");
 
 /**
- * Submit code to Judge0 and get the result
+ * Execute code locally and return stdout/stderr.
  */
 async function executeCode(
     code: string,
-    languageId: number,
+    language: string,
     stdin: string
-): Promise<{ stdout: string | null; stderr: string | null; status: string }> {
-    // Step 1: Create a submission on Judge0
-    const createResponse = await fetch(`${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-RapidAPI-Key": JUDGE0_KEY,
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-        },
-        body: JSON.stringify({
-            source_code: code,
-            language_id: languageId,
-            stdin: stdin,
-        }),
-    });
-
-    if (!createResponse.ok) {
-        const errorText = await createResponse.text();
-        console.error("Judge0 error:", errorText);
-        throw new Error(`Judge0 API error: ${createResponse.status}`);
+): Promise<{ stdout: string | null; stderr: string | null }> {
+    if (!existsSync(TMP_DIR)) {
+        mkdirSync(TMP_DIR, { recursive: true });
     }
 
-    const result = await createResponse.json();
+    const timeout = 10000;
 
-    return {
-        stdout: result.stdout ? result.stdout.trim() : null,
-        stderr: result.stderr ? result.stderr.trim() : null,
-        status: result.status?.description || "Unknown",
-    };
+    try {
+        if (language === "python") {
+            const filePath = path.join(TMP_DIR, "solution.py");
+            writeFileSync(filePath, code);
+            const stdinCmd = stdin ? `printf '%s' "${stdin.replace(/'/g, "'\\''")}" | ` : "";
+            const { stdout, stderr } = await execAsync(
+                `${stdinCmd}python3 "${filePath}"`,
+                { timeout }
+            );
+            return { stdout: stdout.trim(), stderr: stderr ? stderr.trim() : null };
+
+        } else if (language === "cpp") {
+            const srcPath = path.join(TMP_DIR, "solution.cpp");
+            const outPath = path.join(TMP_DIR, "solution_cpp");
+            writeFileSync(srcPath, code);
+            await execAsync(`g++ -o "${outPath}" "${srcPath}"`, { timeout });
+            const stdinCmd = stdin ? `printf '%s' "${stdin.replace(/'/g, "'\\''")}" | ` : "";
+            const { stdout, stderr } = await execAsync(
+                `${stdinCmd}"${outPath}"`,
+                { timeout }
+            );
+            try { unlinkSync(outPath); } catch { /* ignore */ }
+            return { stdout: stdout.trim(), stderr: stderr ? stderr.trim() : null };
+
+        } else if (language === "java") {
+            const srcPath = path.join(TMP_DIR, "Main.java");
+            writeFileSync(srcPath, code);
+            await execAsync(`javac "${srcPath}"`, { timeout });
+            const stdinCmd = stdin ? `printf '%s' "${stdin.replace(/'/g, "'\\''")}" | ` : "";
+            const { stdout, stderr } = await execAsync(
+                `${stdinCmd}java -cp "${TMP_DIR}" Main`,
+                { timeout }
+            );
+            try { unlinkSync(path.join(TMP_DIR, "Main.class")); } catch { /* ignore */ }
+            return { stdout: stdout.trim(), stderr: stderr ? stderr.trim() : null };
+
+        } else {
+            return { stdout: null, stderr: `Unsupported language: ${language}` };
+        }
+    } catch (error: unknown) {
+        const execError = error as { stderr?: string; message?: string; killed?: boolean };
+        if (execError.killed) {
+            return { stdout: null, stderr: "Time Limit Exceeded (10s)" };
+        }
+        return {
+            stdout: null,
+            stderr: execError.stderr?.trim() || execError.message || "Execution failed",
+        };
+    }
 }
 
 export async function POST(request: NextRequest) {
@@ -64,7 +85,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { problemId, code, language, user = "Player1" } = body;
 
-        // Validate required fields
         if (!problemId || !code || !language) {
             return NextResponse.json(
                 { error: "Missing required fields: problemId, code, language" },
@@ -72,43 +92,75 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Get the problem
         const problem = getProblemById(problemId);
         if (!problem) {
-            return NextResponse.json(
-                { error: "Problem not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({ error: "Problem not found" }, { status: 404 });
         }
 
-        // Get Judge0 language ID
-        const languageId = LANGUAGE_IDS[language];
-        if (!languageId) {
+        if (!["python", "cpp", "java"].includes(language)) {
             return NextResponse.json(
                 { error: `Unsupported language: ${language}` },
                 { status: 400 }
             );
         }
 
-        // Execute code via Judge0
-        const result = await executeCode(code, languageId, problem.sampleInput);
+        // Run against ALL test cases
+        const testCases = problem.testCases;
+        const results: { passed: boolean; input: string; expected: string; actual: string; hidden: boolean; error?: string }[] = [];
+        let allPassed = true;
+        let firstError = "";
 
-        // Determine submission status
+        for (const tc of testCases) {
+            const result = await executeCode(code, language, tc.input);
+
+            if (result.stderr) {
+                allPassed = false;
+                firstError = result.stderr;
+                results.push({
+                    passed: false,
+                    input: tc.input,
+                    expected: tc.expectedOutput,
+                    actual: result.stderr,
+                    hidden: tc.hidden,
+                    error: result.stderr,
+                });
+                break; // Stop on first error
+            }
+
+            const passed = result.stdout === tc.expectedOutput.trim();
+            if (!passed) allPassed = false;
+
+            results.push({
+                passed,
+                input: tc.input,
+                expected: tc.expectedOutput,
+                actual: result.stdout || "(no output)",
+                hidden: tc.hidden,
+            });
+
+            if (!passed) break; // Stop on first failure
+        }
+
+        // Determine overall status
         let status: Submission["status"];
         let output: string;
 
-        if (result.stderr || result.status === "Runtime Error (NZEC)" || result.status.includes("Error")) {
+        if (firstError) {
             status = "Runtime Error";
-            output = result.stderr || result.status;
-        } else if (result.stdout === problem.expectedOutput.trim()) {
+            output = firstError;
+        } else if (allPassed) {
             status = "Accepted";
-            output = result.stdout || "";
+            output = `All ${testCases.length} test cases passed!`;
         } else {
             status = "Wrong Answer";
-            output = result.stdout || "(no output)";
+            const failedCase = results.find((r) => !r.passed);
+            output = failedCase?.actual || "(no output)";
         }
 
-        // Create and store submission
+        // Count passed
+        const passedCount = results.filter((r) => r.passed).length;
+
+        // Store submission
         const submission: Submission = {
             id: Date.now().toString(),
             problemId,
@@ -126,13 +178,22 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             status: submission.status,
             output: submission.output,
-            expectedOutput: problem.expectedOutput,
+            testResults: results.map((r) => ({
+                passed: r.passed,
+                input: r.hidden ? "(hidden)" : r.input,
+                expected: r.hidden ? "(hidden)" : r.expected,
+                actual: r.hidden && r.passed ? "✓" : r.actual,
+                hidden: r.hidden,
+                error: r.error,
+            })),
+            passedCount,
+            totalCount: testCases.length,
             submissionId: submission.id,
         });
     } catch (error) {
         console.error("Submission error:", error);
         return NextResponse.json(
-            { error: "Failed to process submission. Check your Judge0 API key." },
+            { error: "Failed to execute code. Make sure python3/g++/javac is installed." },
             { status: 500 }
         );
     }

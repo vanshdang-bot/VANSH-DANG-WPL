@@ -1,8 +1,9 @@
 /**
- * Problem Page — Code Editor, AI Tutor & Notes
+ * Problem Page — Code Editor, Test Cases, AI Tutor & Notes
  * 
- * Shows problem description on the left, Monaco code editor on the right,
- * with tabbed AI Tutor / Notes panel below the editor.
+ * Shows problem description on the left with test cases,
+ * Monaco editor on the right with Run/Submit, Show Solution button,
+ * and tabbed AI Tutor / Notes panel below.
  */
 
 "use client";
@@ -12,27 +13,39 @@ import dynamic from "next/dynamic";
 import AIChatbot from "@/components/AIChatbot";
 import NotePad from "@/components/NotePad";
 
-// Dynamically import Monaco to avoid SSR issues
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
+
+interface TestCase {
+    input: string;
+    expectedOutput: string;
+    hidden: boolean;
+}
 
 interface Problem {
     id: string;
     title: string;
     description: string;
     difficulty: "Easy" | "Medium" | "Hard";
-    sampleInput: string;
-    expectedOutput: string;
-    starterCode: {
-        python: string;
-        cpp: string;
-        java: string;
-    };
+    testCases: TestCase[];
+    starterCode: { python: string; cpp: string; java: string };
+    solution: { python: string; cpp: string; java: string };
+}
+
+interface TestResult {
+    passed: boolean;
+    input: string;
+    expected: string;
+    actual: string;
+    hidden: boolean;
+    error?: string;
 }
 
 interface SubmissionResult {
     status: "Accepted" | "Wrong Answer" | "Runtime Error";
     output: string;
-    expectedOutput: string;
+    testResults: TestResult[];
+    passedCount: number;
+    totalCount: number;
 }
 
 interface PastSubmission {
@@ -42,14 +55,12 @@ interface PastSubmission {
     createdAt: string;
 }
 
-// Language options for the dropdown
 const LANGUAGES = [
     { value: "python", label: "Python 3", monacoId: "python" },
     { value: "cpp", label: "C++", monacoId: "cpp" },
     { value: "java", label: "Java", monacoId: "java" },
 ];
 
-// Tab options for bottom panel
 type BottomTab = "chat" | "notes";
 
 export default function ProblemPage({
@@ -67,8 +78,9 @@ export default function ProblemPage({
     const [submitting, setSubmitting] = useState(false);
     const [pastSubmissions, setPastSubmissions] = useState<PastSubmission[]>([]);
     const [bottomTab, setBottomTab] = useState<BottomTab>("chat");
+    const [showSolution, setShowSolution] = useState(false);
 
-    // Fetch the problem data
+    // Fetch problem
     useEffect(() => {
         setLoading(true);
         fetch(`/api/problems/${id}`)
@@ -81,27 +93,27 @@ export default function ProblemPage({
             .catch(() => setLoading(false));
     }, [id]);
 
-    // Fetch past submissions for this problem
+    // Fetch past submissions
     useEffect(() => {
         fetch(`/api/submissions?problemId=${id}`)
             .then((res) => res.json())
             .then((data) => setPastSubmissions(data))
             .catch(() => { });
-    }, [id, result]); // Refetch when new result comes in
+    }, [id, result]);
 
-    // Handle language change — load starter code
+    // Language change
     function handleLanguageChange(newLang: string) {
         setLanguage(newLang);
+        setShowSolution(false);
         if (problem) {
             const key = newLang as keyof Problem["starterCode"];
             setCode(problem.starterCode[key] || "");
         }
     }
 
-    // Submit code to the API
+    // Submit code
     async function handleSubmit() {
         if (!problem || submitting) return;
-
         setSubmitting(true);
         setResult(null);
 
@@ -109,43 +121,53 @@ export default function ProblemPage({
             const res = await fetch("/api/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    problemId: problem.id,
-                    code,
-                    language,
-                }),
+                body: JSON.stringify({ problemId: problem.id, code, language }),
             });
-
             const data = await res.json();
-
             if (res.ok) {
                 setResult(data);
             } else {
                 setResult({
                     status: "Runtime Error",
                     output: data.error || "Something went wrong",
-                    expectedOutput: problem.expectedOutput,
+                    testResults: [],
+                    passedCount: 0,
+                    totalCount: problem.testCases.length,
                 });
             }
         } catch {
             setResult({
                 status: "Runtime Error",
                 output: "Network error. Please try again.",
-                expectedOutput: problem?.expectedOutput || "",
+                testResults: [],
+                passedCount: 0,
+                totalCount: problem?.testCases.length || 0,
             });
         } finally {
             setSubmitting(false);
         }
     }
 
-    // Get difficulty badge class
+    // Show/hide solution
+    function toggleSolution() {
+        if (!problem) return;
+        if (!showSolution) {
+            const key = language as keyof Problem["solution"];
+            setCode(problem.solution[key] || "");
+            setShowSolution(true);
+        } else {
+            const key = language as keyof Problem["starterCode"];
+            setCode(problem.starterCode[key] || "");
+            setShowSolution(false);
+        }
+    }
+
     function getBadgeClass(diff: string) {
         if (diff === "Easy") return "badge-easy";
         if (diff === "Medium") return "badge-medium";
         return "badge-hard";
     }
 
-    // Get result display info
     function getResultStyle(status: string) {
         switch (status) {
             case "Accepted":
@@ -157,7 +179,6 @@ export default function ProblemPage({
         }
     }
 
-    // Loading state
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -178,24 +199,24 @@ export default function ProblemPage({
         );
     }
 
+    // Get the visible example test case
+    const exampleTestCase = problem.testCases.find((tc) => !tc.hidden);
+    const hiddenCount = problem.testCases.filter((tc) => tc.hidden).length;
+
     return (
         <div className="flex flex-col gap-6 lg:flex-row">
-            {/* ─── LEFT PANEL: Problem Description ──────────────── */}
+            {/* ─── LEFT PANEL ──────────────────────────────────── */}
             <div className="w-full lg:w-2/5">
                 <div className="brutal-card rounded-lg p-6">
-                    {/* Title & Difficulty */}
                     <div className="mb-4 flex items-center gap-3">
                         <h1 className="text-2xl font-bold">{problem.title}</h1>
                         <span
-                            className={`${getBadgeClass(
-                                problem.difficulty
-                            )} rounded-md px-2 py-1 text-xs uppercase`}
+                            className={`${getBadgeClass(problem.difficulty)} rounded-md px-2 py-1 text-xs uppercase`}
                         >
                             {problem.difficulty}
                         </span>
                     </div>
 
-                    {/* Description */}
                     <div
                         className="prose mb-6 max-w-none text-sm"
                         dangerouslySetInnerHTML={{
@@ -208,29 +229,36 @@ export default function ProblemPage({
                         }}
                     />
 
-                    {/* Sample I/O */}
-                    {problem.sampleInput && (
-                        <div className="mb-4">
+                    {/* Example Test Case */}
+                    {exampleTestCase && (
+                        <div className="mb-4 rounded-md border-2 border-brutal-border bg-white p-4">
                             <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-500">
-                                Sample Input
+                                📋 Example Test Case
                             </h3>
-                            <pre className="rounded-md border-2 border-brutal-border bg-brutal-bg p-3 text-sm">
-                                {problem.sampleInput}
-                            </pre>
+                            {exampleTestCase.input && (
+                                <div className="mb-2">
+                                    <p className="text-xs font-bold text-gray-400">Input:</p>
+                                    <pre className="rounded border border-gray-200 bg-brutal-bg p-2 text-sm">
+                                        {exampleTestCase.input}
+                                    </pre>
+                                </div>
+                            )}
+                            <div>
+                                <p className="text-xs font-bold text-gray-400">Expected Output:</p>
+                                <pre className="rounded border border-gray-200 bg-brutal-bg p-2 text-sm">
+                                    {exampleTestCase.expectedOutput}
+                                </pre>
+                            </div>
                         </div>
                     )}
 
-                    <div className="mb-4">
-                        <h3 className="mb-2 text-sm font-bold uppercase tracking-wide text-gray-500">
-                            Expected Output
-                        </h3>
-                        <pre className="rounded-md border-2 border-brutal-border bg-brutal-bg p-3 text-sm">
-                            {problem.expectedOutput}
-                        </pre>
+                    {/* Hidden test cases indicator */}
+                    <div className="rounded-md border-2 border-dashed border-gray-300 bg-gray-50 p-3 text-center text-sm text-gray-500">
+                        🔒 <strong>{hiddenCount} hidden test case{hiddenCount > 1 ? "s" : ""}</strong> will also be evaluated
                     </div>
                 </div>
 
-                {/* ─── Past Submissions ──────────────────────────────── */}
+                {/* Past Submissions */}
                 {pastSubmissions.length > 0 && (
                     <div className="brutal-card mt-4 rounded-lg p-6">
                         <h3 className="mb-3 text-lg font-bold">📋 Your Submissions</h3>
@@ -261,42 +289,56 @@ export default function ProblemPage({
                 )}
             </div>
 
-            {/* ─── RIGHT PANEL: Code Editor + Bottom Panel ─────── */}
+            {/* ─── RIGHT PANEL ─────────────────────────────────── */}
             <div className="w-full lg:w-3/5">
-                {/* Language Selector & Buttons */}
+                {/* Controls bar */}
                 <div className="mb-4 flex items-center justify-between">
-                    {/* Language dropdown */}
-                    <select
-                        value={language}
-                        onChange={(e) => handleLanguageChange(e.target.value)}
-                        className="brutal-btn rounded-md bg-white px-4 py-2 text-sm"
-                    >
-                        {LANGUAGES.map((lang) => (
-                            <option key={lang.value} value={lang.value}>
-                                {lang.label}
-                            </option>
-                        ))}
-                    </select>
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-3">
-                        <button
-                            onClick={handleSubmit}
-                            disabled={submitting}
-                            className="brutal-btn rounded-md bg-brutal-green px-6 py-2 text-sm"
+                    <div className="flex items-center gap-3">
+                        <select
+                            value={language}
+                            onChange={(e) => handleLanguageChange(e.target.value)}
+                            className="brutal-btn rounded-md bg-white px-4 py-2 text-sm"
                         >
-                            {submitting ? "⏳ Running..." : "▶ Run & Submit"}
+                            {LANGUAGES.map((lang) => (
+                                <option key={lang.value} value={lang.value}>
+                                    {lang.label}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Show Solution button */}
+                        <button
+                            onClick={toggleSolution}
+                            className={`brutal-btn rounded-md px-4 py-2 text-sm ${showSolution
+                                    ? "bg-brutal-yellow text-brutal-dark"
+                                    : "bg-white text-brutal-dark"
+                                }`}
+                        >
+                            {showSolution ? "🔙 Hide Solution" : "💡 Show Solution"}
                         </button>
                     </div>
+
+                    <button
+                        onClick={handleSubmit}
+                        disabled={submitting}
+                        className="brutal-btn rounded-md bg-brutal-green px-6 py-2 text-sm"
+                    >
+                        {submitting ? "⏳ Running..." : "▶ Run & Submit"}
+                    </button>
                 </div>
+
+                {/* Solution warning */}
+                {showSolution && (
+                    <div className="mb-3 rounded-md border-2 border-brutal-yellow bg-brutal-yellow/20 p-3 text-sm font-medium">
+                        ⚠️ You are viewing the solution. Try solving it yourself first!
+                    </div>
+                )}
 
                 {/* Monaco Editor */}
                 <div className="editor-container rounded-lg">
                     <Editor
-                        height="350px"
-                        language={
-                            LANGUAGES.find((l) => l.value === language)?.monacoId || "python"
-                        }
+                        height="320px"
+                        language={LANGUAGES.find((l) => l.value === language)?.monacoId || "python"}
                         value={code}
                         onChange={(value) => setCode(value || "")}
                         theme="vs-dark"
@@ -316,42 +358,63 @@ export default function ProblemPage({
                 {/* ─── Result Display ───────────────────────────────── */}
                 {result && (
                     <div
-                        className={`brutal-card mt-4 rounded-lg p-6 ${getResultStyle(result.status).bg
-                            }`}
+                        className={`brutal-card mt-4 rounded-lg p-6 ${getResultStyle(result.status).bg}`}
                     >
-                        <div className="mb-3 flex items-center gap-2">
-                            <span className="text-2xl">
-                                {getResultStyle(result.status).icon}
+                        <div className="mb-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <span className="text-2xl">{getResultStyle(result.status).icon}</span>
+                                <h3 className="text-xl font-bold">{getResultStyle(result.status).text}</h3>
+                            </div>
+                            <span className="rounded-md border-2 border-brutal-border bg-white px-3 py-1 text-sm font-bold">
+                                {result.passedCount}/{result.totalCount} passed
                             </span>
-                            <h3 className="text-xl font-bold">
-                                {getResultStyle(result.status).text}
-                            </h3>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="mb-1 text-sm font-bold uppercase tracking-wide">
-                                    Your Output
-                                </p>
-                                <pre className="rounded-md border-2 border-brutal-border bg-white p-3 text-sm">
-                                    {result.output || "(no output)"}
-                                </pre>
+                        {/* Per-test-case results */}
+                        {result.testResults.length > 0 && (
+                            <div className="space-y-2">
+                                {result.testResults.map((tr, i) => (
+                                    <div
+                                        key={i}
+                                        className="flex items-center gap-3 rounded-md border-2 border-brutal-border bg-white p-3 text-sm"
+                                    >
+                                        <span className="text-lg">
+                                            {tr.passed ? "✅" : "❌"}
+                                        </span>
+                                        <div className="flex-1">
+                                            <span className="font-bold">
+                                                Test #{i + 1}
+                                                {tr.hidden ? " (Hidden)" : ""}
+                                            </span>
+                                            {!tr.hidden && !tr.passed && (
+                                                <div className="mt-1 grid grid-cols-2 gap-2 text-xs">
+                                                    <div>
+                                                        <span className="font-bold text-gray-500">Expected:</span>
+                                                        <pre className="mt-1 rounded bg-gray-100 p-1">{tr.expected}</pre>
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-bold text-gray-500">Your output:</span>
+                                                        <pre className="mt-1 rounded bg-gray-100 p-1">{tr.actual}</pre>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div>
-                                <p className="mb-1 text-sm font-bold uppercase tracking-wide">
-                                    Expected Output
-                                </p>
-                                <pre className="rounded-md border-2 border-brutal-border bg-white p-3 text-sm">
-                                    {result.expectedOutput}
-                                </pre>
-                            </div>
-                        </div>
+                        )}
+
+                        {/* Fallback for errors without test results */}
+                        {result.testResults.length === 0 && result.output && (
+                            <pre className="mt-2 rounded-md border-2 border-brutal-border bg-white p-3 text-sm">
+                                {result.output}
+                            </pre>
+                        )}
                     </div>
                 )}
 
                 {/* ─── Bottom Panel: AI Tutor / Notes ─────────────── */}
                 <div className="brutal-card mt-4 overflow-hidden rounded-lg">
-                    {/* Tab buttons */}
                     <div className="flex border-b-3 border-brutal-border">
                         <button
                             onClick={() => setBottomTab("chat")}
@@ -373,12 +436,11 @@ export default function ProblemPage({
                         </button>
                     </div>
 
-                    {/* Tab content */}
                     {bottomTab === "chat" && (
                         <AIChatbot
                             problemTitle={problem.title}
                             problemDescription={problem.description}
-                            expectedOutput={problem.expectedOutput}
+                            expectedOutput={exampleTestCase?.expectedOutput || ""}
                             userCode={code}
                         />
                     )}

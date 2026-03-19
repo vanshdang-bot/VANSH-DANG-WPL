@@ -4,12 +4,32 @@
     "title": "Hello World",
     "description": "Write a program that prints **Hello, World!** to the console.\n\nThis is your very first coding challenge! Simply output the exact text shown in the expected output.",
     "difficulty": "Easy",
-    "sampleInput": "",
-    "expectedOutput": "Hello, World!",
+    "testCases": [
+      {
+        "input": "",
+        "expectedOutput": "Hello, World!",
+        "hidden": false
+      },
+      {
+        "input": "",
+        "expectedOutput": "Hello, World!",
+        "hidden": true
+      },
+      {
+        "input": "",
+        "expectedOutput": "Hello, World!",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Write your solution here\nprint(\"Hello, World!\")",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your solution here\n    cout << \"Hello, World!\" << endl;\n    return 0;\n}",
-      "java": "public class Main {\n    public static void main(String[] args) {\n        // Write your solution here\n        System.out.println(\"Hello, World!\");\n    }\n}"
+      "python": "# Write your solution here\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your solution here\n    \n    return 0;\n}",
+      "java": "public class Main {\n    public static void main(String[] args) {\n        // Write your solution here\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "print(\"Hello, World!\")",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello, World!\" << endl;\n    return 0;\n}",
+      "java": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}"
     }
   },
   {
@@ -17,10 +37,30 @@
     "title": "Sum of Two Numbers",
     "description": "Read two integers from standard input (each on a separate line) and print their sum.\n\n### Example\n**Input:**\n```\n3\n5\n```\n**Output:**\n```\n8\n```",
     "difficulty": "Easy",
-    "sampleInput": "3\n5",
-    "expectedOutput": "8",
+    "testCases": [
+      {
+        "input": "3\n5",
+        "expectedOutput": "8",
+        "hidden": false
+      },
+      {
+        "input": "10\n20",
+        "expectedOutput": "30",
+        "hidden": true
+      },
+      {
+        "input": "-7\n3",
+        "expectedOutput": "-4",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Read two numbers and print their sum\na = int(input())\nb = int(input())\nprint(a + b)",
+      "python": "# Read two numbers and print their sum\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Read two numbers and print their sum\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Read two numbers and print their sum\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "a = int(input())\nb = int(input())\nprint(a + b)",
       "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a, b;\n    cin >> a >> b;\n    cout << a + b << endl;\n    return 0;\n}",
       "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        System.out.println(a + b);\n    }\n}"
     }
@@ -30,12 +70,32 @@
     "title": "Even or Odd",
     "description": "Read an integer from standard input and print `Even` if it is even, or `Odd` if it is odd.\n\n### Example\n**Input:**\n```\n4\n```\n**Output:**\n```\nEven\n```",
     "difficulty": "Easy",
-    "sampleInput": "4",
-    "expectedOutput": "Even",
+    "testCases": [
+      {
+        "input": "4",
+        "expectedOutput": "Even",
+        "hidden": false
+      },
+      {
+        "input": "7",
+        "expectedOutput": "Odd",
+        "hidden": true
+      },
+      {
+        "input": "0",
+        "expectedOutput": "Even",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Read a number and check if it's even or odd\nn = int(input())\n",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // Check if even or odd\n    return 0;\n}",
-      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // Check if even or odd\n    }\n}"
+      "python": "# Read a number and check if it's even or odd\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Read a number and check if it's even or odd\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Read a number and check if it's even or odd\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "n = int(input())\nif n % 2 == 0:\n    print(\"Even\")\nelse:\n    print(\"Odd\")",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    if (n % 2 == 0) cout << \"Even\" << endl;\n    else cout << \"Odd\" << endl;\n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(n % 2 == 0 ? \"Even\" : \"Odd\");\n    }\n}"
     }
   },
   {
@@ -43,12 +103,32 @@
     "title": "Reverse a String",
     "description": "Read a string from standard input and print it reversed.\n\n### Example\n**Input:**\n```\nhello\n```\n**Output:**\n```\nolleh\n```",
     "difficulty": "Medium",
-    "sampleInput": "hello",
-    "expectedOutput": "olleh",
+    "testCases": [
+      {
+        "input": "hello",
+        "expectedOutput": "olleh",
+        "hidden": false
+      },
+      {
+        "input": "abcdef",
+        "expectedOutput": "fedcba",
+        "hidden": true
+      },
+      {
+        "input": "racecar",
+        "expectedOutput": "racecar",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Read a string and print it reversed\ns = input()\n",
-      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    cin >> s;\n    // Reverse and print s\n    return 0;\n}",
-      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // Reverse and print s\n    }\n}"
+      "python": "# Read a string and print it reversed\n",
+      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    // Read a string and print it reversed\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Read a string and print it reversed\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "s = input()\nprint(s[::-1])",
+      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    cin >> s;\n    reverse(s.begin(), s.end());\n    cout << s << endl;\n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        System.out.println(new StringBuilder(s).reverse().toString());\n    }\n}"
     }
   },
   {
@@ -56,12 +136,32 @@
     "title": "FizzBuzz",
     "description": "Read an integer `n` from standard input. For each number from 1 to n:\n- Print `FizzBuzz` if divisible by both 3 and 5\n- Print `Fizz` if divisible by 3\n- Print `Buzz` if divisible by 5\n- Otherwise print the number\n\nEach output on a new line.\n\n### Example\n**Input:**\n```\n5\n```\n**Output:**\n```\n1\n2\nFizz\n4\nBuzz\n```",
     "difficulty": "Medium",
-    "sampleInput": "5",
-    "expectedOutput": "1\n2\nFizz\n4\nBuzz",
+    "testCases": [
+      {
+        "input": "5",
+        "expectedOutput": "1\n2\nFizz\n4\nBuzz",
+        "hidden": false
+      },
+      {
+        "input": "15",
+        "expectedOutput": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz",
+        "hidden": true
+      },
+      {
+        "input": "3",
+        "expectedOutput": "1\n2\nFizz",
+        "hidden": true
+      }
+    ],
     "starterCode": {
       "python": "# FizzBuzz\nn = int(input())\n",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // FizzBuzz logic here\n    return 0;\n}",
-      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // FizzBuzz logic here\n    }\n}"
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // FizzBuzz logic here\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // FizzBuzz logic here\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "n = int(input())\nfor i in range(1, n + 1):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    for (int i = 1; i <= n; i++) {\n        if (i % 15 == 0) cout << \"FizzBuzz\" << endl;\n        else if (i % 3 == 0) cout << \"Fizz\" << endl;\n        else if (i % 5 == 0) cout << \"Buzz\" << endl;\n        else cout << i << endl;\n    }\n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        for (int i = 1; i <= n; i++) {\n            if (i % 15 == 0) System.out.println(\"FizzBuzz\");\n            else if (i % 3 == 0) System.out.println(\"Fizz\");\n            else if (i % 5 == 0) System.out.println(\"Buzz\");\n            else System.out.println(i);\n        }\n    }\n}"
     }
   },
   {
@@ -69,12 +169,32 @@
     "title": "Fibonacci Number",
     "description": "Read an integer `n` from standard input and print the `n`-th Fibonacci number (0-indexed).\n\nThe Fibonacci sequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, ...\n\n### Example\n**Input:**\n```\n6\n```\n**Output:**\n```\n8\n```",
     "difficulty": "Hard",
-    "sampleInput": "6",
-    "expectedOutput": "8",
+    "testCases": [
+      {
+        "input": "6",
+        "expectedOutput": "8",
+        "hidden": false
+      },
+      {
+        "input": "0",
+        "expectedOutput": "0",
+        "hidden": true
+      },
+      {
+        "input": "10",
+        "expectedOutput": "55",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Find the n-th Fibonacci number\nn = int(input())\n",
-      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    // Calculate n-th Fibonacci\n    return 0;\n}",
-      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // Calculate n-th Fibonacci\n    }\n}"
+      "python": "# Find the n-th Fibonacci number\n",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Find the n-th Fibonacci number\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Find the n-th Fibonacci number\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "n = int(input())\na, b = 0, 1\nfor _ in range(n):\n    a, b = b, a + b\nprint(a)",
+      "cpp": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n;\n    cin >> n;\n    int a = 0, b = 1;\n    for (int i = 0; i < n; i++) {\n        int t = a + b;\n        a = b;\n        b = t;\n    }\n    cout << a << endl;\n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int a = 0, b = 1;\n        for (int i = 0; i < n; i++) {\n            int t = a + b;\n            a = b;\n            b = t;\n        }\n        System.out.println(a);\n    }\n}"
     }
   },
   {
@@ -82,12 +202,32 @@
     "title": "Palindrome Check",
     "description": "Read a string from standard input and print `Yes` if it is a palindrome, or `No` if it is not. A palindrome reads the same forwards and backwards.\n\n### Example\n**Input:**\n```\nracecar\n```\n**Output:**\n```\nYes\n```",
     "difficulty": "Hard",
-    "sampleInput": "racecar",
-    "expectedOutput": "Yes",
+    "testCases": [
+      {
+        "input": "racecar",
+        "expectedOutput": "Yes",
+        "hidden": false
+      },
+      {
+        "input": "hello",
+        "expectedOutput": "No",
+        "hidden": true
+      },
+      {
+        "input": "madam",
+        "expectedOutput": "Yes",
+        "hidden": true
+      }
+    ],
     "starterCode": {
-      "python": "# Check if the string is a palindrome\ns = input()\n",
-      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    cin >> s;\n    // Check palindrome\n    return 0;\n}",
-      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // Check palindrome\n    }\n}"
+      "python": "# Check if the string is a palindrome\n",
+      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    // Check if the string is a palindrome\n    \n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Check if the string is a palindrome\n        \n    }\n}"
+    },
+    "solution": {
+      "python": "s = input()\nif s == s[::-1]:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+      "cpp": "#include <iostream>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string s;\n    cin >> s;\n    string rev = s;\n    reverse(rev.begin(), rev.end());\n    if (s == rev) cout << \"Yes\" << endl;\n    else cout << \"No\" << endl;\n    return 0;\n}",
+      "java": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.println(s.equals(rev) ? \"Yes\" : \"No\");\n    }\n}"
     }
   }
 ]

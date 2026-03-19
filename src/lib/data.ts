@@ -1,8 +1,5 @@
 /**
  * data.ts — Helper functions for reading/writing JSON data files.
- * 
- * This module provides simple file-based storage using JSON files
- * located in the /data directory at the project root.
  */
 
 import fs from "fs";
@@ -10,14 +7,24 @@ import path from "path";
 
 // ─── Types ───────────────────────────────────────────────────────────
 
+export interface TestCase {
+  input: string;
+  expectedOutput: string;
+  hidden: boolean;
+}
+
 export interface Problem {
   id: string;
   title: string;
   description: string;
   difficulty: "Easy" | "Medium" | "Hard";
-  sampleInput: string;
-  expectedOutput: string;
+  testCases: TestCase[];
   starterCode: {
+    python: string;
+    cpp: string;
+    java: string;
+  };
+  solution: {
     python: string;
     cpp: string;
     java: string;
@@ -75,7 +82,6 @@ export function getSubmissions(problemId?: string): Submission[] {
     return submissions.filter((s) => s.problemId === problemId);
   }
 
-  // Return newest first
   return submissions.sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -100,7 +106,6 @@ export interface LeaderboardEntry {
 export function getLeaderboard(): LeaderboardEntry[] {
   const submissions = getSubmissions();
 
-  // Track unique accepted problems per user
   const userSolves: Record<string, Set<string>> = {};
 
   for (const sub of submissions) {
@@ -112,7 +117,6 @@ export function getLeaderboard(): LeaderboardEntry[] {
     }
   }
 
-  // Convert to sorted array
   const entries = Object.entries(userSolves)
     .map(([user, problemSet]) => ({
       rank: 0,
@@ -121,7 +125,6 @@ export function getLeaderboard(): LeaderboardEntry[] {
     }))
     .sort((a, b) => b.solved - a.solved);
 
-  // Assign ranks
   entries.forEach((entry, i) => {
     entry.rank = i + 1;
   });

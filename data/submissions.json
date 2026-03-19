@@ -1,1 +1,57 @@
-[]
+[
+  {
+    "id": "1773917753118",
+    "problemId": "3",
+    "problemTitle": "Even or Odd",
+    "code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(\"Even\");\n    }\n}",
+    "language": "java",
+    "status": "Wrong Answer",
+    "output": "Even",
+    "createdAt": "2026-03-19T10:55:53.118Z",
+    "user": "Player1"
+  },
+  {
+    "id": "1773917742244",
+    "problemId": "3",
+    "problemTitle": "Even or Odd",
+    "code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(\"Odd\");\n    }\n}",
+    "language": "java",
+    "status": "Wrong Answer",
+    "output": "Odd",
+    "createdAt": "2026-03-19T10:55:42.244Z",
+    "user": "Player1"
+  },
+  {
+    "id": "1773917727409",
+    "problemId": "3",
+    "problemTitle": "Even or Odd",
+    "code": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        System.out.println(n % 2 == 0 ? \"Even\" : \"Odd\");\n    }\n}",
+    "language": "java",
+    "status": "Accepted",
+    "output": "All 3 test cases passed!",
+    "createdAt": "2026-03-19T10:55:27.409Z",
+    "user": "Player1"
+  },
+  {
+    "id": "1773917622210",
+    "problemId": "2",
+    "problemTitle": "Sum of Two Numbers",
+    "code": "a= int(input())\nb = int(input())\nprint(a + b)",
+    "language": "python",
+    "status": "Accepted",
+    "output": "All 3 test cases passed!",
+    "createdAt": "2026-03-19T10:53:42.210Z",
+    "user": "Player1"
+  },
+  {
+    "id": "1773917855966",
+    "problemId": "1",
+    "problemTitle": "Hello World",
+    "code": "# Write your solution here\nprint(\"Hello, World!\")",
+    "language": "python",
+    "status": "Accepted",
+    "output": "All 3 test cases passed!",
+    "createdAt": "2026-03-19T10:57:35.966Z",
+    "user": "Player1"
+  }
+]
